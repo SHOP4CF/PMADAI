@@ -1,0 +1,6 @@
+flask
+envyaml
+kafka-python
+gunicorn==20.1.0
+requests
+simplejson

@@ -1,0 +1,11 @@
+kafka:
+  bootstrap_servers:
+    - ${KAFKA_BOOTSTRAP_SERVER1}
+  preprocessing-results-topic: PreprocessingResults
+general:
+  logging-level: ${LOGGING_LEVEL}
+  prediction-api-url: ${PREDICTION_API_URL}
+  backend-api-url: ${BACKEND_API_URL}
+  backend_auth:
+    username: processing
+    password:  # set password here, same as in .\backend\config.yml

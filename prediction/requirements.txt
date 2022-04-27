@@ -1,0 +1,9 @@
+flask
+numpy
+envyaml
+simplejson
+tensorflow
+joblib
+scikit-learn
+gunicorn==20.1.0
+pytest

@@ -1,0 +1,11 @@
+envyaml
+tsfresh
+kafka-python
+pandas
+influxdb-client
+scipy
+simplejson
+openpyxl
+joblib
+pytest
+statsmodels

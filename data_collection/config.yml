@@ -1,0 +1,25 @@
+kafka:
+  topics:
+    - Metadata
+    - SMT
+    - JobsTrends
+    - PositionTrends
+    - VoltageTrends
+    - CurrentTrends
+    - ChargeTrends
+  bootstrap_servers:
+    - ${KAFKA_BOOTSTRAP_SERVER1}
+influx:
+  url: ${INFLUX_URL}
+  token: ${INFLUX_TOKEN}
+  org: ${INFLUX_ORG}
+  bucket: ${INFLUX_BUCKET}
+oracle:
+  dsn: ${ORACLE_DSN}
+  port: ${ORACLE_PORT}
+  username: ${ORACLE_USERNAME}
+  password: ${ORACLE_PASSWORD}
+  encoding: ${ORACLE_ENCODING}
+general:
+  logging-level: ${LOGGING_LEVEL}
+  deployment_env: ${DEPLOYMENT_ENV}

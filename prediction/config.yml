@@ -1,0 +1,12 @@
+flask:
+  port: 5000
+models:
+  model-type: ISOLATIONFOREST,AUTOENCODER
+  scaling-std_multiplication:
+    isolationforest: null
+    autoencoder: 1
+  aggregation_weights:
+    isolationforest: 0.3
+    autoencoder: 0.7
+general:
+  logging-level: ${LOGGING_LEVEL}

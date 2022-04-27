@@ -1,0 +1,5 @@
+kafka-python
+PyYAML
+cx-Oracle
+envyaml
+influxdb-client

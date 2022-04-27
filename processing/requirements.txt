@@ -1,0 +1,4 @@
+envyaml
+kafka-python
+requests
+simplejson

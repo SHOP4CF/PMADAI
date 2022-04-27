@@ -1,0 +1,22 @@
+kafka:
+  metadata-topic: Metadata
+  bootstrap_servers:
+    - ${KAFKA_BOOTSTRAP_SERVER1}
+  preprocessing-results-topic: PreprocessingResults
+  alerts-topic: Alerts
+influx:
+  url: ${INFLUX_URL}
+  token: ${INFLUX_TOKEN}
+  org: ${INFLUX_ORG}
+  bucket: ${INFLUX_BUCKET}
+oracle:
+  dsn: ${ORACLE_DSN}
+  port: ${ORACLE_PORT}
+  username: ${ORACLE_USERNAME}
+  password: ${ORACLE_PASSWORD}
+  encoding: ${ORACLE_ENCODING}
+general:
+  sleep-time: ${SLEEP_TIME} # seconds
+  logging-level: ${LOGGING_LEVEL}
+  interpolation-points: 32
+  smoother: SimpleExponentialSmoothing

@@ -1,0 +1,109 @@
+CREATE SEQUENCE METADATA_IDENTITY
+     START WITH 1
+     INCREMENT BY 1
+     NOCACHE
+     NOCYCLE;
+
+CREATE TABLE Metadata (
+    id NUMBER NOT NULL,
+    time_of_event TIMESTAMP NOT NULL,
+    in_out VARCHAR2(10) NOT NULL,
+    car_body_id VARCHAR2(20) NOT NULL,
+    car_body_type VARCHAR2(10) NOT NULL,
+    voltage_program_type VARCHAR2(10) NOT NULL,
+    skid_id NUMBER NOT NULL,
+    pendulum_id NUMBER NOT NULL,
+    CONSTRAINT metadata_pk PRIMARY KEY (id)
+);
+
+CREATE TRIGGER METADATA_TRIGGER
+BEFORE INSERT ON Metadata
+FOR EACH ROW
+BEGIN
+   :NEW.id := METADATA_IDENTITY.NextVal;
+END;
+
+CREATE SEQUENCE SMT_IDENTITY
+     START WITH 1
+     INCREMENT BY 1
+     NOCACHE
+     NOCYCLE;
+
+CREATE TABLE SMT (
+    id NUMBER NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    skid_id NUMBER NOT NULL,
+    type_of_smt_event VARCHAR2(10) NOT NULL,
+    CONSTRAINT smt_id PRIMARY KEY (id)
+);
+
+CREATE TRIGGER SMT_TRIGGER
+BEFORE INSERT ON SMT
+FOR EACH ROW
+BEGIN
+   :NEW.id := SMT_IDENTITY.NextVal;
+END;
+
+CREATE SEQUENCE PAINTING_IDENTITY
+     START WITH 1
+     INCREMENT BY 1
+     NOCACHE
+     NOCYCLE;
+
+CREATE TABLE PaintingPredictions (
+    id NUMBER NOT NULL,
+    prediction_result BLOB NOT NULL,
+    human_result BLOB NOT NULL,
+    problematic_painting NUMBER(3) NOT NULL,
+    preprocessing_status VARCHAR2(20) NOT NULL,
+    time_of_event TIMESTAMP NOT NULL,
+    in_out VARCHAR2(10) NOT NULL,
+    car_body_id VARCHAR2(20) NOT NULL,
+    car_body_type VARCHAR2(10) NOT NULL,
+    voltage_program_type VARCHAR2(10) NOT NULL,
+    skid_id NUMBER NOT NULL,
+    pendulum_id NUMBER NOT NULL,
+    features BLOB NOT NULL,
+    raw_data BLOB NOT NULL,
+    human_verified 	NUMBER(3) NOT NULL,
+    date_modified TIMESTAMP NOT NULL,
+    CONSTRAINT painting_predictions_pk PRIMARY KEY (id)
+);
+
+CREATE TRIGGER PaintingPredictionsTrigger
+BEFORE INSERT ON PaintingPredictions
+FOR EACH ROW
+BEGIN
+   :NEW.id := PAINTING_IDENTITY.NextVal;
+END;
+
+CREATE SEQUENCE ALERT_IDENTITY
+     START WITH 1
+     INCREMENT BY 1
+     NOCACHE
+     NOCYCLE;
+
+CREATE TABLE ALERTS (
+    id NUMBER NOT NULL,
+    full_alert BLOB NOT NULL,
+    category VARCHAR2(40) NOT NULL,
+    sub_category VARCHAR2(40) NOT NULL,
+    human_verified VARCHAR2(5) NOT NULL,
+    alert_source VARCHAR2(100) NOT NULL,
+    source VARCHAR2(20) NOT NULL,
+    time_of_event TIMESTAMP NOT NULL,
+    CONSTRAINT alert_id PRIMARY KEY (id)
+);
+
+CREATE TRIGGER ALERTS_TRIGGER
+BEFORE INSERT ON ALERTS
+FOR EACH ROW
+BEGIN
+   :NEW.id := ALERT_IDENTITY.NextVal;
+END;
+
+CREATE SEQUENCE ALERT_ID
+     START WITH 1
+     INCREMENT BY 1
+     NOCACHE
+     NOCYCLE;

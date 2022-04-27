@@ -1,0 +1,126 @@
+version: "3.9"
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+  kafka:
+    build:
+      context: ./kafka-docker
+    image: docker.ramp.eu/psnc-pvt/pmadai-kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: ${KAFKA_ADVERTISED_HOST_NAME}
+      KAFKA_CREATE_TOPICS: "${KAFKA_CREATE_TOPICS}"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test:
+        ["CMD", "nc", "-vz", "localhost", "9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+  data-collection:
+    build:
+      context: .
+      dockerfile: ./data_collection/Dockerfile
+    image: docker.ramp.eu/psnc-pvt/pmadai-data-collection:latest
+    environment:
+      ORACLE_DSN: ${ORACLE_DSN}
+      ORACLE_PORT: ${ORACLE_PORT}
+      ORACLE_USERNAME: ${ORACLE_USERNAME}
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      ORACLE_ENCODING: '${ORACLE_ENCODING}'
+      KAFKA_BOOTSTRAP_SERVER1: ${KAFKA_BOOTSTRAP_SERVER1}
+      INFLUX_URL: ${INFLUX_URL}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      LOGGING_LEVEL: ${DATA_COLLECTION_LOGGING_LEVEL}
+      DEPLOYMENT_ENV: ${DEPLOYMENT_ENV}
+    depends_on:
+      kafka:
+        condition:
+          service_healthy
+  preprocessing:
+    build:
+      context: ./preprocessing
+    image: docker.ramp.eu/psnc-pvt/pmadai-preprocessing:latest
+    environment:
+      ORACLE_DSN: ${ORACLE_DSN}
+      ORACLE_PORT: ${ORACLE_PORT}
+      ORACLE_USERNAME: ${ORACLE_USERNAME}
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      ORACLE_ENCODING: '${ORACLE_ENCODING}'
+      KAFKA_BOOTSTRAP_SERVER1: ${KAFKA_BOOTSTRAP_SERVER1}
+      INFLUX_URL: ${INFLUX_URL}
+      INFLUX_TOKEN: ${INFLUX_TOKEN}
+      INFLUX_ORG: ${INFLUX_ORG}
+      INFLUX_BUCKET: ${INFLUX_BUCKET}
+      LOGGING_LEVEL: ${PREPROCESSING_LOGGING_LEVEL}
+      SLEEP_TIME: 600 # seconds
+    depends_on:
+      kafka:
+        condition:
+          service_healthy
+  orion-kafka-bridge:
+    build:
+      context: ./orion-kafka-bridge
+    image: docker.ramp.eu/psnc-pvt/pmadai-orion-kafka-bridge:latest
+    command: gunicorn --bind 0.0.0.0:5000 -w 4 'src.main:init_app()'
+    environment:
+      KAFKA_BOOTSTRAP_SERVER1: ${KAFKA_BOOTSTRAP_SERVER1}
+      LOGGING_LEVEL: ${ORION_KAFKA_BRIDGE_LOGGING_LEVEL}
+      ORION_SERVER: ${ORION_SERVER}
+      ORION_KAFKA_BRIDGE: ${ORION_KAFKA_BRIDGE}
+    depends_on:
+      kafka:
+        condition:
+          service_healthy
+  kafka-orion-alert:
+    build:
+      context: .
+      dockerfile: ./kafka-orion-alert/Dockerfile
+    image: docker.ramp.eu/psnc-pvt/pmadai-kafka-orion-alert:latest
+    environment:
+      KAFKA_BOOTSTRAP_SERVER1: ${KAFKA_BOOTSTRAP_SERVER1}
+      LOGGING_LEVEL: ${KAFKA_ORION_ALERT_LOGGING_LEVEL}
+      ORION_SERVER: ${ORION_SERVER}
+      ORACLE_DSN: ${ORACLE_DSN}
+      ORACLE_PORT: ${ORACLE_PORT}
+      ORACLE_USERNAME: ${ORACLE_USERNAME}
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      ORACLE_ENCODING: '${ORACLE_ENCODING}'
+      DEPLOYMENT_ENV: ${DEPLOYMENT_ENV}
+    depends_on:
+      kafka:
+        condition:
+          service_healthy
+  prediction:
+    build:
+      context: ./prediction
+    image: docker.ramp.eu/psnc-pvt/pmadai-prediction:latest
+    command: gunicorn --bind 0.0.0.0:5000 -w 1 'src.main:init_app()'
+    environment:
+      LOGGING_LEVEL: ${PREDICTION_LOGGING_LEVEL}
+    volumes:
+      - ../prediction_data:/data # for storing jsons
+  processing:
+    build:
+      context: ./processing
+    image: docker.ramp.eu/psnc-pvt/pmadai-processing:latest
+    environment:
+      LOGGING_LEVEL: ${PROCESSING_LOGGING_LEVEL}
+      PREDICTION_API_URL: ${PREDICTION_API_URL}
+      KAFKA_BOOTSTRAP_SERVER1: ${KAFKA_BOOTSTRAP_SERVER1}
+      BACKEND_API_URL: ${BACKEND_API_URL}
+    depends_on:
+      kafka:
+        condition:
+          service_healthy
+networks:
+  default:
+    external:
+      name: pmadai_default

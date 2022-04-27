@@ -1,0 +1,16 @@
+flask:
+  port: 5000
+general:
+  logging-level: ${LOGGING_LEVEL}
+  orion-server: ${ORION_SERVER}
+  deployment_env: ${DEPLOYMENT_ENV}
+kafka:
+  bootstrap_servers:
+    - ${KAFKA_BOOTSTRAP_SERVER1}
+  alerts-topic: Alerts
+oracle:
+  dsn: ${ORACLE_DSN}
+  port: ${ORACLE_PORT}
+  username: ${ORACLE_USERNAME}
+  password: ${ORACLE_PASSWORD}
+  encoding: ${ORACLE_ENCODING}

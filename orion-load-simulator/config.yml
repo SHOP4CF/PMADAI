@@ -1,0 +1,7 @@
+general:
+  metadata-start-sleep-time: ${METADATA_START_SLEEP_TIME_SECONDS}
+  metadata-sleep-time: ${METADATA_SLEEP_TIME_SECONDS}
+  trends-sleep-time: ${TRENDS_SLEEP_TIME_SECONDS}
+  logging-level: ${LOGGING_LEVEL}
+  orion-server: ${ORION_SERVER}
+  orion-kafka-bridge: ${ORION_KAFKA_BRIDGE}

@@ -1,0 +1,39 @@
+.idea
+.env
+*.log
+*.idea
+__pycache__
+*/venv
+.pytest_cache
+
+frontend/.DS_Store
+frontend/node_modules
+frontend/dist
+frontend/package-lock.json
+
+# local env files
+frontend/.env.local
+frontend/.env.*.local
+!frontend/.env
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+frontend/.vscode
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+orion-load-simulator/trends
+orion-load-simulator/Metadata.xlsx
+
+prediction/models_data
+prediction/data/
+
+# Alerts reading simulator
+orion-alerts-simulator/

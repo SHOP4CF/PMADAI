@@ -1,0 +1,9 @@
+flask:
+  port: 5000
+general:
+  logging-level: ${LOGGING_LEVEL}
+  orion-server: ${ORION_SERVER}
+  orion-kafka-bridge: ${ORION_KAFKA_BRIDGE}
+kafka:
+  bootstrap_servers:
+    - ${KAFKA_BOOTSTRAP_SERVER1}
