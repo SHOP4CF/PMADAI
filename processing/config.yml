@@ -2,6 +2,7 @@ kafka:
   bootstrap_servers:
     - ${KAFKA_BOOTSTRAP_SERVER1}
   preprocessing-results-topic: PreprocessingResults
+  alerts-topic: Alerts
 general:
   logging-level: ${LOGGING_LEVEL}
   prediction-api-url: ${PREDICTION_API_URL}

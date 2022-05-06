@@ -5,41 +5,10 @@ import simplejson as json
 from src.consumers.preprocessing_result_consumer import PreprocessingResultConsumer
 from src.utils import set_up_logger
 from src.config_reader import config
+from src.domain.painting_prediction import PaintingPrediction
+from src.producers.anomaly_alert_producer import alert_producer
 
 JWT = None
-
-
-def post_to_backend():
-    """
-    This function is responsible for posting data to the backend module, including the login token.
-    If such a token does not exist or has expired, it is re-logged in using the login data appropriate for this module.
-    """
-    global JWT
-    backend_response = requests.post(f"{config['general']['backend-api-url']}/api/painting-predictions",
-                                     data=json.dumps(painting_prediction),
-                                     headers={'Content-type': 'application/json',
-                                              'Accept': 'text/plain',
-                                              'Authorization': f'Bearer {JWT}'})
-    logging.debug(backend_response.text)
-    if backend_response.status_code == 401 or not JWT:  # Authenticate and re-post
-        logging.debug(f"Authenticating")
-
-        auth_response = requests.post(f"{config['general']['backend-api-url']}/auth/login",
-                                      data={'username': config['general']['backend_auth']['username'],
-                                            'password': config['general']['backend_auth']['password']},
-                                      headers={'Content-type': 'application/x-www-form-urlencoded',
-                                               'Accept': 'text/plain'})
-
-        logging.debug(f"{auth_response.text}")
-
-        JWT = auth_response.json()["accessToken"]
-
-        backend_response = requests.post(f"{config['general']['backend-api-url']}/api/painting-predictions",
-                                         data=json.dumps(painting_prediction),
-                                         headers={'Content-type': 'application/json',
-                                                  'Accept': 'text/plain',
-                                                  'Authorization': f'Bearer {JWT}'})
-    return backend_response
 
 
 def get_prediction():
@@ -78,6 +47,17 @@ def construct_painting_prediction():
     return painting_prediction
 
 
+def raise_alert_if_problematic_painting():
+    """
+    This method is checking the necessity of raising an alert and if true, alarm about painting incorrectness is sending.
+    """
+    pp = PaintingPrediction.from_painting_prediction(painting_prediction)
+    # processing status is necessary for no-duplicate alerts inserting.
+    # (Other status has been reported in preprocessing module.)
+    if pp.preprocessing_status == 'CORRECT' and pp.problematic_painting:
+        alert_producer.produce(pp)
+
+
 if __name__ == '__main__':
     # Set up logger
     set_up_logger()
@@ -94,11 +74,4 @@ if __name__ == '__main__':
         prediction_response = get_prediction()
 
         painting_prediction = construct_painting_prediction()
-
-        # BACKEND. Lines below should be uncommented if backend module is available.
-        # logging.info(f"Posting to backend module.")
-        # logging.debug(f"Posting message: {painting_prediction}")
-
-        # backend_response = post_to_backend()
-
-        # logging.debug(f"Backend response: {backend_response.json()}")
+        raise_alert_if_problematic_painting()
